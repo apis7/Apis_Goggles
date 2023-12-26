@@ -84,6 +84,48 @@ $discard,site=cnn.com
 $discard,site=foxnews.com
 $discard,site=theatlantic.com
 $discard,site=vox.com
+$discard,site=dailywire.com
+$discard,site=theblaze.com
+$discard,site=washingtonexaminer.com
+$discard,site=dailycaller.com
+$discard,site=westernjournal.com
+$discard,site=nationalreview.com
+$discard,site=washingtontimes.com
+$discard,site=gatewaypundit.com
+$discard,site=hannity.com
+$discard,site=breitbart.com
+$discard,site=redstate.com
+$discard,site=townhall.com
+$discard,site=thefederalist.com
+$discard,site=dailysignal.com
+$discard,site=pjmedia.com
+$discard,site=prageru.com
+$discard,site=twitchy.com
+$discard,site=nypost.com
+$discard,site=oann.com
+$discard,site=dailycaller.com
+$discard,site=voanews.com
+$discard,site=heritage.org
+$discard,site=newsbusters.org
+$discard,site=bizpacreview.com
+$discard,site=csmonitor.com
+$discard,site=theothermccain.com
+$discard,site=rep-am.com
+$discard,site=bonginoreport.com
+$discard,site=freebeacon.com
+$discard,site=hotair.com
+$discard,site=wnd.com
+$discard,site=dailysignal.com
+$discard,site=spectator.org
+$discard,site=thenewamerican.com
+$discard,site=americanthinker.com
+$discard,site=charliekirk.com
+$discard,site=hughhewitt.com
+$discard,site=thehill.com
+$discard,site=thefederalistpapers.org
+$discard,site=timesofisrael.com
+$discard,site=sky.com
+$discard,site=theamericanconservative.com
 
 !Discard CATEGORY: Medical Lobby
 $discard,site=quackwatch.org
@@ -140,6 +182,16 @@ $discard,site=pritikin.com
 $discard,site=health.com
 $discard,site=verywellfit.com
 *well*$discard,inurl
+$discard,site=medpagetoday.com
+$discard,site=skepdic.com
+$discard,site=scienceblogs.com
+$discard,site=statnews.com
+$discard,site=respectfulinsolence.com
+$discard,site=wired.com
+$discard,site=beckershospitalreview.com
+$discard,site=projcare.com
+
+
 
 !DOWNRANK the following:
 $downrank=2,site=medium.com
@@ -156,6 +208,7 @@ $downrank,site=babycenter.com
 $boost=5,gab.com
 $boost=4,paleomedicina.com
 $boost=3,=drberg.com
+$boost=5,=samaritanministries.org
 $boost=3,=lifesitenews.com
 $boost=4,site=api.drupal.org
 $boost=3,site=drupal.stackexchange.com
@@ -247,3 +300,4 @@ $boost,=phoenixhelix.com
 $boost,=megtherhn.com
 $boost,=laurasnaturallife.com
 chomps.com
+burzynskiclinic.com
