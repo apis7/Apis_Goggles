@@ -205,7 +205,6 @@ $downrank,site=babycenter.com
 !BOOST the following:
 *blog*$boost=7,inurl
 *substack*$boost,inurl
-$boost=4,site=righto.com
 $boost=4,site=gab.com
 $boost=4,site=paleomedicina.com
 $boost=3,=drberg.com
