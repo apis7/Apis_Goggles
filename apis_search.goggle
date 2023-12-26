@@ -4,47 +4,12 @@
 ! author: Apis
 !avatar: #fcea7e
 
-!removes spam, porn, psuedo-propaganda sites
+!removes spam, psuedo-propaganda sites, medical lobby sites, etc. Get information from people you care about, who care about you. Skip information from people who want to take advantage of you, 
+!rip you off, lull you, mislead you, eugenically cull you, or in any way have nothing near your best interests at heart.
 
 ! Discard the following:
-$discard, site=google.com
-$discard,site=akamaiedge.net
-$discard,site=microsoft.com
-$discard,site=linkedin.com
-$discard,site=apple.com
-$discard,site=cloudflare.com
-$discard,site=yahoo.com
-$discard,site=cnn.com
-$discard,site=foxnews.com
-$discard,site=abcnews.com
-$discard,site=tumblr.com
-$discard,site=nytimes.com
-$discard,site=xvideos.com
-$discard,site=pornhub.com
-$discard,site=bbc.com
-$discard,site=theguardian.com
-$discard,site=forbes.com
-$discard,site=bbc.co.uk
-$discard,site=quora.com
-$discard,site=chaturbate.com
-$discard,site=xhamster.com
-$discard,site=indeed.com
-$discard,site=duckduckgo.com
-$discard,site=spankbang.com
-$discard,site=reuters.com
-$discard,site=washingtonpost.com
-$discard,site=wikimedia.org
-$discard,site=dailymail.co.uk
-$discard,site=tiktokcdn.com
-$discard,site=harvard.edu
-$discard,site=bloomberg.com
-$discard,site=wsj.com
-$discard,site=businessinsider.com
-$discard,site=cnbc.com
-$discard,site=espn.com
-$discard,site=nytimes.com
-$discard,site=cnn.com
-$discard,site=foxnews.com
+
+!Discard Category: News
 $discard,site=msn.com
 $discard,site=finance.yahoo.com
 $discard,site=news.google.com
@@ -60,7 +25,7 @@ $discard,site=theguardian.com
 $discard,site=nbcnews.com
 $discard,site=wsj.com
 $discard,site=apnews.com
-$discard,site=https://www.huffpost.com/
+$discard,site=huffpost.com
 $discard,site=newsweek.com
 $discard,site=cbsnews.com
 $discard,site=reuters.com
@@ -69,13 +34,13 @@ $discard,site=businessinsider.com
 $discard,site=politico.com
 $discard,site=newsmax.com
 $discard,site=sciencebasedmedicine.org
-spectrumlocalnews.com
-carnegieendowment.org
-Haaretz.com
-rollingstone.com
-time.com
-boston.com
-fastcompany.com
+$discard,site=spectrumlocalnews.com
+$discard,site=carnegieendowment.org
+$discard,site=haaretz.com
+$discard,site=rollingstone.com
+$discard,site=time.com
+$discard,site=boston.com
+$discard,site=fastcompany.com
 *reuters*$discard,inurl
 *abc*$discard,inurl
 *google*$discard,inurl
@@ -86,6 +51,91 @@ fastcompany.com
 *jpost*$discard,inurl
 *npr*$discard,inurl
 *cnn*$discard,inurl
+$discard,site=akamaiedge.net
+$discard,site=microsoft.com
+$discard,site=linkedin.com
+$discard,site=apple.com
+$discard,site=cloudflare.com
+$discard,site=yahoo.com
+$discard,site=cnn.com
+$discard,site=foxnews.com
+$discard,site=abcnews.com
+$discard,site=tumblr.com
+$discard,site=nytimes.com
+$discard,site=bbc.com
+$discard,site=theguardian.com
+$discard,site=forbes.com
+$discard,site=bbc.co.uk
+$discard,site=quora.com
+$discard,site=indeed.com
+$discard,site=duckduckgo.com
+$discard,site=reuters.com
+$discard,site=washingtonpost.com
+$discard,site=wikimedia.org
+$discard,site=dailymail.co.uk
+$discard,site=tiktokcdn.com
+$discard,site=bloomberg.com
+$discard,site=wsj.com
+$discard,site=businessinsider.com
+$discard,site=cnbc.com
+$discard,site=espn.com
+$discard,site=nytimes.com
+$discard,site=cnn.com
+$discard,site=foxnews.com
+theatlantic.com
+
+!Discard Category: Medical Lobby
+$discard,site=quackwatch.org
+$discard,site=harvard.edu
+$discard,site=dokumen.pub
+$discard,site=rationalwiki.org
+medicalnewstoday.com
+healthline.com
+webmd.com
+acs.org
+mayoclinic.org
+nccih.nih.gov
+mountsinai.org
+clevelandclinic.org
+mind.org.uk
+verywellhealth.com
+verywellmind.com
+kaiserpermanente.org
+aafp.org
+fda.gov
+bu.edu
+kumc.edu
+nhs.uk
+unitypoint.org
+hhs.gov
+umms.org
+christianacare.org
+healthmatters.nyp.org
+pennmedicine.org
+uchicagomedicine.org
+osfhealthcare.org
+vdh.virginia.gov
+hopkinsmedicine.org
+yalemedicine.org
+cdph.ca.gov
+houstonmethodist.org
+health.ucdavis.edu
+healthdirect.gov.au
+scientificamerican.com
+michiganmedicine.org
+lung.org
+healthpartners.com
+who.int
+atriumhealth.org
+bhf.ork.uk
+medcenterhealth.org
+avera.org
+everydayhealth.com
+eatingwell.com
+bbcgoodfood.com
+clevelandclinic.org
+livestrong.com
+
 
 
 !Downrake the following:
@@ -94,7 +144,7 @@ $downrank,site=instagram.com
 $downrank,site=twitter.com
 $downrank,site=youtube.com
 $downrank,site=facebook.com
-$downrank=2,site=wikipedia.org
+$downrank=3,site=wikipedia.org
 
 !Boost the following:
 $boost=4,gab.com
@@ -134,5 +184,17 @@ PressTV.com
 GreenMedInfo.com
 vactruth.com
 DCClothesLine.com
-
-
+earthclinic.com
+cancercenterforhealing.com
+yummy.doctor
+listentoyourgut.com
+tonyrobbins.com
+drruscio.com
+ancestralnutrition.com.au
+doctorkiltz.com
+tasty-yummies.com
+heartstonefarm.com
+thewellnessway.com
+nobleorigins.com
+myprotein.com
+chriskresser.com
