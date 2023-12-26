@@ -191,6 +191,8 @@ $discard,site=beckershospitalreview.com
 $discard,site=projcare.com
 
 
+
+
 !DOWNRANK the following:
 $downrank=2,site=medium.com
 $downrank,site=instagram.com
