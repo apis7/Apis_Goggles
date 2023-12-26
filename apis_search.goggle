@@ -3,3 +3,8 @@
 ! public: true
 ! author: Apis
 
+homepage — specifies a homepage URL displayed on your Goggle's profile.
+issues — specifies a URL where users can report issues for your Goggle.
+transferred_to — Allows to transfer ownership of a Goggle.
+avatar — specifies a valid HEX color code for your Goggle.
+license — specifies the license of a Goggle's instructions.
