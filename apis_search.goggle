@@ -5,3 +5,22 @@
 !avatar: #fcea7e
 
 !removes spam, porn, psuedo-propaganda sites
+
+! Discard the following:
+$discard, site=google.com
+$discard,site=akamaiedge.net
+$discard,site=microsoft.com
+$discard,site=linkedin.com
+
+!Downrake the following:
+$downrank,site=medium.com
+$downrank,site=instagram.com
+$downrank,site=twitter.com
+$downrank,site=youtube.com
+$downrank,site=facebook.com
+$downrank=2,site=wikipedia.org
+
+!Boost the following:
+$boost=4,gab.com
+$boost=4,site=api.drupal.org
+$boost=3,site=drupal.stackexchange.com
