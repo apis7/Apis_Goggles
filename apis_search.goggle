@@ -7,9 +7,21 @@
 !removes spam, psuedo-propaganda sites, medical lobby sites, etc. Get information from people you care about, who care about you. Skip information from people who want to take advantage of you, 
 !rip you off, lull you, mislead you, eugenically cull you, or in any way have nothing near your best interests at heart.
 
-! DISCARD (eliminate) the following:
 
-!Discard CATEGORY: News
+!DISCARD LIST
+
+*reuters*$discard,inurl
+*yahoo*$discard,inurl
+*abc*$discard,inurl
+*google*$discard,inurl
+*cbs*$discard,inurl
+*foxnews*$discard,inurl
+*bbc*$discard,inurl
+*pbs*$discard,inurl
+*jpost*$discard,inurl
+*npr*$discard,inurl
+*cnn*$discard,inurl
+*vegan*$discard,inurl
 $discard,site=msn.com
 $discard,site=finance.yahoo.com
 $discard,site=news.google.com
@@ -41,16 +53,16 @@ $discard,site=rollingstone.com
 $discard,site=time.com
 $discard,site=boston.com
 $discard,site=fastcompany.com
-*reuters*$discard,inurl
-*abc*$discard,inurl
-*google*$discard,inurl
-*cbs*$discard,inurl
-*foxnews*$discard,inurl
-*bbc*$discard,inurl
-*pbs*$discard,inurl
-*jpost*$discard,inurl
-*npr*$discard,inurl
-*cnn*$discard,inurl
+$discard,site=*reuters*$discard,inurl
+$discard,site=*abc*$discard,inurl
+$discard,site=*google*$discard,inurl
+$discard,site=*cbs*$discard,inurl
+$discard,site=*foxnews*$discard,inurl
+$discard,site=*bbc*$discard,inurl
+$discard,site=*pbs*$discard,inurl
+$discard,site=*jpost*$discard,inurl
+$discard,site=*npr*$discard,inurl
+$discard,site=*cnn*$discard,inurl
 $discard,site=akamaiedge.net
 $discard,site=microsoft.com
 $discard,site=linkedin.com
@@ -79,7 +91,6 @@ $discard,site=wsj.com
 $discard,site=businessinsider.com
 $discard,site=cnbc.com
 $discard,site=espn.com
-$discard,site=nytimes.com
 $discard,site=cnn.com
 $discard,site=foxnews.com
 $discard,site=theatlantic.com
@@ -126,8 +137,6 @@ $discard,site=thefederalistpapers.org
 $discard,site=timesofisrael.com
 $discard,site=sky.com
 $discard,site=theamericanconservative.com
-
-!Discard CATEGORY: Medical Lobby
 $discard,site=quackwatch.org
 $discard,site=harvard.edu
 $discard,site=dokumen.pub
@@ -189,22 +198,84 @@ $discard,site=respectfulinsolence.com
 $discard,site=wired.com
 $discard,site=beckershospitalreview.com
 $discard,site=projcare.com
+$discard,site=healthfeedback.org
+$discard,site=earthclinic.com
+$discard,site=fifthseasonfinancial.com
+$discard,site=mskcc.org
+$discard,site=cvs.com
+$discard,site=msk1.ru
+$discard,site=walgreens.com
+$discard,site=msdmanuals.com
+$discard,site=1mg.com
+$discard,site=medlineplus.gov
+$discard,site=altibbi.com
+$discard,site=halodoc.com
+$discard,site=menshealth.com
+$discard,site=babycenter.com
+$discard,site=MedlinePlus.gov
+$discard,site=healthcare-digital.com
+$discard,site=kidshealth.org
+$discard,site=weightwatchers.com
+$discard,site=netdoctor.co.uk
+$discard,site=menshealth.com
+$discard,site=everydayhealth.com
+$discard,site=spiritualityhealth.com
+$discard,site=YouAligned.com
+$discard,site=mantramagazine.com
+$discard,site=thrivemagazine.com
+$discard,site=fitbottomedgirls.com
+$discard,site=ohsheglows.com
+$discard,site=tinybuddha.com
+$discard,site=wellandgood.com
+$discard,site=mindbodygreen.com
+$discard,site=cancer.gov
+$discard,site=aafp.org
+$discard,site=mayoclinicproceedings.org
+$discard,site=nursingworld.org
+$discard,site=arthritis.org
+$discard,site=diabetes.org
+$discard,site=mentalhealth.gov
+$discard,site=alz.org
+$discard,site=aidsinfo.nih.gov
+$discard,site=sleepfoundation.org
+$discard,site=eatright.org
+$discard,site=choosemyplate.gov
+$discard,site=kidney.org
+$discard,site=eatwell101.com
+$discard,site=cookinglight.com
+$discard,site=nutritionfacts.org
+$discard,site=precisionnutrition.com
+$discard,site=authoritynutrition.com
+$discard,site=myplate2yours.com
+$discard,site=jillianmichaels.com
+$discard,site=veganhealth.org
+$discard,site=forksoverknives.com
+$discard,site=theveganrd.com
+$discard,site=plantbasednews.org
+$discard,site=happyherbivore.com
+$discard,site=veganuary.com
+$discard,site=mercyforanimals.org
+$discard,site=veganhealth.org
+$discard,site=diabetesfreelife.org
+$discard,site=aace.com
+$discard,site=health.ny.gov
+$discard,site=healthyeating.org
+$discard,site=transparentlabs.com
+$discard,site=vegi1.org
+$discard,site=ox.ac.uk
 
+!DOWNRANK LIST
 
-
-
-!DOWNRANK the following:
-$downrank=2,site=medium.com
-$downrank,site=instagram.com
-$downrank,site=twitter.com
-$downrank,site=youtube.com
-$downrank,site=facebook.com
-$downrank=3,site=wikipedia.org
-$downrank,site=babycenter.com
 *well*$downrank,inurl
+$downrank=2,site=medium.com
+$downrank=1,site=instagram.com
+$downrank=1,site=twitter.com
+$downrank=1,site=youtube.com
+$downrank=1,site=facebook.com
+$downrank=6,site=wikipedia.org
+$downrank=3,site=babycenter.com
 
-
-!BOOST the following:
+!BOOST LIST
 *blog*$boost=7,inurl
 *substack*$boost,inurl
 $boost=2,site=pubmed.ncbi.nlm.nih.gov
@@ -220,7 +291,6 @@ $boost=3,site=blogger.com
 $boost=3,site=substack.com
 $boost=8,site=thehighwire.com
 $boost=2,site=icandecide.org
-$boost=2,site=aljazeera.com
 $boost=2,site=childrenshealthdefense.org
 $boost=9,site=nourishingtraditions.com
 $boost=9,site=westonaprice.org
@@ -246,7 +316,6 @@ $boost=2,site=PressTV.com
 $boost=2,site=GreenMedInfo.com
 $boost=2,site=vactruth.com
 $boost=2,site=DCClothesLine.com
-$boost=2,site=earthclinic.com
 $boost=2,site=cancercenterforhealing.com
 $boost=2,site=yummy.doctor
 $boost=2,site=listentoyourgut.com
@@ -301,3 +370,6 @@ $boost=2,site=megtherhn.com
 $boost=2,site=laurasnaturallife.com
 $boost=2,site=chomps.com
 $boost=2,site=burzynskiclinic.com
+$boost=2,site=nationalfile.com
+$boost=2,site=diabetesfreelife.org
+
