@@ -18,7 +18,6 @@
 *foxnews*$discard,inurl
 *bbc*$discard,inurl
 *pbs*$discard,inurl
-*jpost*$discard,inurl
 *npr*$discard,inurl
 *cnn*$discard,inurl
 *vegan*$discard,inurl
@@ -48,7 +47,6 @@ $discard,site=newsmax.com
 $discard,site=sciencebasedmedicine.org
 $discard,site=spectrumlocalnews.com
 $discard,site=carnegieendowment.org
-$discard,site=haaretz.com
 $discard,site=rollingstone.com
 $discard,site=time.com
 $discard,site=boston.com
@@ -60,7 +58,6 @@ $discard,site=*cbs*$discard,inurl
 $discard,site=*foxnews*$discard,inurl
 $discard,site=*bbc*$discard,inurl
 $discard,site=*pbs*$discard,inurl
-$discard,site=*jpost*$discard,inurl
 $discard,site=*npr*$discard,inurl
 $discard,site=*cnn*$discard,inurl
 $discard,site=akamaiedge.net
@@ -76,6 +73,7 @@ $discard,site=tumblr.com
 $discard,site=nytimes.com
 $discard,site=bbc.com
 $discard,site=theguardian.com
+$discard,site=theguardian.co.uk
 $discard,site=forbes.com
 $discard,site=bbc.co.uk
 $discard,site=quora.com
@@ -134,7 +132,6 @@ $discard,site=charliekirk.com
 $discard,site=hughhewitt.com
 $discard,site=thehill.com
 $discard,site=thefederalistpapers.org
-$discard,site=timesofisrael.com
 $discard,site=sky.com
 $discard,site=theamericanconservative.com
 $discard,site=quackwatch.org
@@ -263,6 +260,11 @@ $discard,site=healthyeating.org
 $discard,site=transparentlabs.com
 $discard,site=vegi1.org
 $discard,site=ox.ac.uk
+$discard,site=reuters.com
+$discard,site=politico.com
+$discard,site=politico.eu
+$discard,site=foreignpolicy.com
+
 
 !DOWNRANK LIST
 
@@ -372,4 +374,15 @@ $boost=2,site=chomps.com
 $boost=2,site=burzynskiclinic.com
 $boost=2,site=nationalfile.com
 $boost=2,site=diabetesfreelife.org
+$boost=8,site=middleeasteye.net
+$boost=3,site=timesofisrael.com
+$boost=2,site=haaretz.com
+$boost=2,site=jpost.com
+$boost=4,site=military.com
+$boost=4,site=responsiblestatecraft.org
+$boost=7,site=thepeoplesvoice.tv
+$boost=8,site=iranintl.com
+$boost=8,site=english.almayadeen.net
+$boost=2,site=chabad.org
+
 
