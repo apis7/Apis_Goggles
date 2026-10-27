@@ -1,0 +1,7 @@
+<resources>
+    <style name="Theme.GoggleRater" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/honey_bg</item>
+    </style>
+    <color name="honey_bg">#FFFBF0</color>
+    <color name="honey">#FCEA7E</color>
+</resources>
