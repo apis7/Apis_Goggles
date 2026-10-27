@@ -50,6 +50,7 @@ import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -72,6 +73,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.SubcomposeAsyncImage
 import com.apis.goggles.data.Action
 import com.apis.goggles.data.Candidate
+import com.apis.goggles.data.Domains
 import com.apis.goggles.data.Goggle
 import com.apis.goggles.data.GoggleIndex
 
@@ -106,7 +108,7 @@ fun RateScreen(
     searching: Boolean,
     hasBraveKey: Boolean,
     onSelect: (Goggle) -> Unit,
-    onRate: (Candidate, Action, Int) -> Unit,
+    onRate: (Candidate, Action, Int, Boolean) -> Unit,
     onLater: (Candidate) -> Unit,
     onNeedPreview: (Candidate) -> Unit,
     onFetchMore: () -> Unit,
@@ -152,8 +154,8 @@ fun RateScreen(
 
         if (current != null) {
             RatingPanel(
-                key = current.domain,
-                onRate = { a, s -> onRate(current, a, s) },
+                domain = current.domain,
+                onRate = { a, s, wide -> onRate(current, a, s, wide) },
                 onLater = { onLater(current) },
             )
         }
@@ -181,12 +183,6 @@ private fun CandidateCard(c: Candidate) {
                     Icon(Icons.AutoMirrored.Outlined.OpenInNew, "Open site", tint = MaterialTheme.colorScheme.primary)
                 }
             }
-            Text(
-                "Rating covers ${c.domain}, every *.${c.domain} subdomain, and other ${c.domain.substringBefore('.')}.* domains when they turn up.",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(top = 10.dp),
-            )
             HorizontalDivider(Modifier.padding(vertical = 14.dp), color = MaterialTheme.colorScheme.outlineVariant)
             if (c.hits.isEmpty()) {
                 Text(
@@ -240,10 +236,13 @@ private fun Favicon(c: Candidate, modifier: Modifier) {
 }
 
 @Composable
-private fun RatingPanel(key: String, onRate: (Action, Int) -> Unit, onLater: () -> Unit) {
+private fun RatingPanel(domain: String, onRate: (Action, Int, Boolean) -> Unit, onLater: () -> Unit) {
     val colors = LocalActionColors.current
-    var picking by remember(key) { mutableStateOf<Action?>(null) }
-    Column(Modifier.fillMaxWidth().padding(top = 14.dp, bottom = 8.dp)) {
+    var picking by remember(domain) { mutableStateOf<Action?>(null) }
+    val eligible = remember(domain) { Domains.brandEligible(domain) }
+    var wide by remember(domain) { mutableStateOf(eligible) }
+    Column(Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 8.dp)) {
+        BrandScope(domain, eligible, wide) { wide = it }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
             listOf(Action.DISCARD, Action.DOWNRANK, Action.NEUTRAL, Action.BOOST).forEach { a ->
                 val color = colors.of(a)
@@ -251,7 +250,7 @@ private fun RatingPanel(key: String, onRate: (Action, Int) -> Unit, onLater: () 
                 Surface(
                     onClick = {
                         when (a) {
-                            Action.DISCARD, Action.NEUTRAL -> onRate(a, 0)
+                            Action.DISCARD, Action.NEUTRAL -> onRate(a, 0, wide)
                             else -> picking = if (chosen) null else a
                         }
                     },
@@ -280,7 +279,7 @@ private fun RatingPanel(key: String, onRate: (Action, Int) -> Unit, onLater: () 
                 Row(horizontalArrangement = Arrangement.spacedBy(5.dp), modifier = Modifier.fillMaxWidth()) {
                     (1..10).forEach { n ->
                         Surface(
-                            onClick = { onRate(a, n) },
+                            onClick = { onRate(a, n, wide) },
                             shape = CircleShape,
                             color = color.copy(alpha = 0.10f + 0.07f * n),
                             contentColor = if (n >= 6) MaterialTheme.colorScheme.surface else color,
@@ -330,5 +329,33 @@ private fun EmptyState(searching: Boolean, hasBraveKey: Boolean, onFetchMore: ()
                 OutlinedButton(onClick = onFetchMore) { Text("Find more sites") }
             }
         }
+    }
+}
+
+/** Whether a rating covers just this site (and its subdomains) or every same-name domain. */
+@Composable
+private fun BrandScope(domain: String, eligible: Boolean, wide: Boolean, onChange: (Boolean) -> Unit) {
+    val brand = domain.substringBefore('.')
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp))
+            .clickable(enabled = eligible) { onChange(!wide) }.padding(start = 4.dp, bottom = 8.dp),
+    ) {
+        Column(Modifier.weight(1f)) {
+            Text(
+                if (eligible && wide) "Applies to all $brand.* sites" else "Applies to $domain only",
+                style = MaterialTheme.typography.labelLarge,
+            )
+            Text(
+                when {
+                    !eligible -> "Includes subdomains. Name too common or hosted, so other $brand.* sites aren't included."
+                    wide -> "$brand.com, $brand.co.uk, news.$brand.net… every domain named $brand"
+                    else -> "Includes subdomains like news.$domain"
+                },
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        if (eligible) Switch(checked = wide, onCheckedChange = onChange)
     }
 }

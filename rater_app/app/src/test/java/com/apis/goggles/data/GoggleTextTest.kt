@@ -40,16 +40,45 @@ class GoggleTextTest {
         assertFalse(cov.covers("notnytimes.com"))
     }
 
-    @Test fun siblingTldGetsSameRule() {
-        val cov = Coverage(goggle, listOf(rating("dailywire.com", Action.DISCARD)))
+    @Test fun siteRulesPullSiblingTldsAlong() {
+        val cov = Coverage(goggle, emptyList())
         assertEquals("nytimes.com" to SiteRule(Action.DISCARD, 0), cov.sibling("nytimes.co.uk"))
-        assertEquals("dailywire.com", cov.sibling("dailywire.co.uk")?.first)
         assertNull(cov.sibling("nytimes.com"))
     }
 
     @Test fun genericBrandsAreNotSiblings() {
         val cov = Coverage("\$discard,site=health.com", emptyList())
         assertNull(cov.sibling("health.gov.au"))
+    }
+
+    @Test fun brandRulesCoverEveryTldAndSubdomain() {
+        val cov = Coverage("://abc.\$discard\n.abc.\$discard", emptyList())
+        assertTrue(cov.covers("abc.com"))
+        assertTrue(cov.covers("abc.co.uk"))
+        assertTrue(cov.covers("news.abc.net.au"))
+        assertFalse(cov.covers("abcam.com"))
+        assertFalse(cov.covers("example.abc"))
+    }
+
+    @Test fun brandWideRatingWritesBrandRulesAndCoversSiblings() {
+        val r = rating("dailywire.com", Action.DOWNRANK, 3).copy(brandWide = true)
+        assertEquals(listOf("://dailywire.\$downrank=3", ".dailywire.\$downrank=3"), r.ruleLines())
+        val cov = Coverage("", listOf(r))
+        assertTrue(cov.covers("dailywire.co.uk"))
+        val out = GoggleEditor.apply(goggle, listOf(r))
+        assertTrue("://dailywire.\$downrank=3" in out)
+        // Re-rating the brand replaces both lines.
+        val again = GoggleEditor.apply(out, listOf(r.copy(action = Action.DISCARD)))
+        assertFalse("downrank=3" in again)
+        assertTrue("://dailywire.\$discard" in again)
+    }
+
+    @Test fun brandEligibility() {
+        assertTrue(Domains.brandEligible("cnn.com"))
+        assertTrue(Domains.brandEligible("abc.net.au"))
+        assertFalse(Domains.brandEligible("someone.blogspot.com"))
+        assertFalse(Domains.brandEligible("health.com"))
+        assertFalse(Domains.brandEligible("ox.ac.uk"))
     }
 
     @Test fun registrableHandlesMultiPartSuffixes() {

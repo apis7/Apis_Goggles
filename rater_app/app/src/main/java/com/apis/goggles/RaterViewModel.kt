@@ -195,10 +195,13 @@ class RaterViewModel(app: Application) : AndroidViewModel(app) {
 
     // ---- rating -------------------------------------------------------------------------------
 
-    fun rate(c: Candidate, action: Action, strength: Int = 0) {
+    fun rate(c: Candidate, action: Action, strength: Int = 0, brandWide: Boolean = false) {
         val g = selected.value
         viewModelScope.launch {
-            val r = Rating(g, c.domain, action, strength, System.currentTimeMillis(), candidate = c)
+            val r = Rating(
+                g, c.domain, action, strength, System.currentTimeMillis(), candidate = c,
+                brandWide = brandWide && action != Action.NEUTRAL && Domains.brandEligible(c.domain),
+            )
             update { s ->
                 s.copy(ratings = s.ratings.filterNot { it.goggle == g && it.domain == c.domain && it.state == SyncState.PENDING_ADD } + r)
                     .with(g) { it.copy(queue = it.queue.filterNot { q -> q.domain == c.domain }) }
@@ -264,7 +267,7 @@ class RaterViewModel(app: Application) : AndroidViewModel(app) {
                     val ops = state.value.pending(g)
                     if (ops.isEmpty()) continue
                     val message = "Goggle Rater: ${ops.size} change(s) to ${g.asset}\n\n" +
-                        ops.joinToString("\n") { (if (it.state == SyncState.PENDING_REMOVE) "- " else "+ ") + it.ruleLine() }
+                        ops.joinToString("\n") { (if (it.state == SyncState.PENDING_REMOVE) "- " else "+ ") + it.ruleLines().joinToString(" ") }
                     try {
                         val text = GitHubApi.update(s.repo, s.branch, g.repoPath, s.githubToken, message) { GoggleEditor.apply(it, ops) }
                         update { st ->

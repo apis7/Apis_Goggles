@@ -55,13 +55,25 @@ data class Rating(
     val state: SyncState = SyncState.PENDING_ADD,
     /** Kept until synced so an undo can put the site back in the queue. */
     val candidate: Candidate? = null,
+    /** Cover every `brand.*` domain (cnn.co.uk, edition.cnn.com), not just this one. */
+    val brandWide: Boolean = false,
 ) {
-    fun ruleLine(): String = when (action) {
-        Action.DISCARD -> "\$discard,site=$domain"
-        Action.DOWNRANK -> "\$downrank=$strength,site=$domain"
-        Action.BOOST -> "\$boost=$strength,site=$domain"
-        Action.NEUTRAL -> "! neutral: $domain"
+    private val option: String get() = when (action) {
+        Action.DISCARD -> "discard"
+        Action.DOWNRANK -> "downrank=$strength"
+        Action.BOOST -> "boost=$strength"
+        Action.NEUTRAL -> ""
     }
+
+    fun ruleLines(): List<String> {
+        if (action == Action.NEUTRAL) return listOf("! neutral: $domain")
+        if (!brandWide) return listOf("\$$option,site=$domain")
+        val brand = Domains.brand(domain)
+        return listOf("://$brand.\$$option", ".$brand.\$$option")
+    }
+
+    /** "cnn.*" for brand-wide ratings, else the domain. */
+    val scope: String get() = if (brandWide) "${Domains.brand(domain)}.*" else domain
 
     fun describe(): String = when (action) {
         Action.DISCARD, Action.NEUTRAL -> action.label

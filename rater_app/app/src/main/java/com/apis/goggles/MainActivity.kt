@@ -69,8 +69,8 @@ private fun App(vm: RaterViewModel) {
                 is UiEvent.Message -> scope.launch { snackbar.showSnackbar(e.text, withDismissAction = true) }
                 is UiEvent.Rated -> scope.launch {
                     snackbar.currentSnackbarData?.dismiss()
-                    val label = e.rating.siblingOf?.let { "${e.rating.domain}: ${e.rating.describe()} (same as $it)" }
-                        ?: "${e.rating.domain}: ${e.rating.describe()}"
+                    val label = e.rating.siblingOf?.let { "${e.rating.scope}: ${e.rating.describe()} (same as $it)" }
+                        ?: "${e.rating.scope}: ${e.rating.describe()}"
                     val result = snackbar.showSnackbar(label, actionLabel = "Undo", duration = SnackbarDuration.Short)
                     if (result == SnackbarResult.ActionPerformed) vm.undo(e.rating)
                 }

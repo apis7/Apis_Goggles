@@ -65,7 +65,7 @@ fun HistoryScreen(goggle: Goggle, ratings: List<Rating>, onUndo: (Rating) -> Uni
                         )
                     }
                     Column(Modifier.weight(1f).padding(horizontal = 12.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                        Text(r.domain, style = MaterialTheme.typography.bodyLarge)
+                        Text(r.scope, style = MaterialTheme.typography.bodyLarge)
                         val status = when (r.state) {
                             SyncState.PENDING_ADD -> "Waiting to sync"
                             SyncState.SYNCED -> "On GitHub"
