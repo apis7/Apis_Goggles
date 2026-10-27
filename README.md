@@ -9,5 +9,6 @@ Apis' Brave Search "Goggles"
 `apis_search.goggle` is the original combined goggle, kept so existing followers keep working.
 
 - `rater_app/` — Goggle Rater, an Android app that finds sites not yet in a goggle, lets you rate them, and commits the rules here.
+- `search_terms.xlsx` — the app's search terms. Edit, then `python tools/search_terms.py export` and push.
 - `tools/split_goggle.py` — one-off split of `apis_search.goggle` into the two goggles.
 - `tools/parse_goggle.py <file.goggle>` — dumps a goggle's rules to CSV.

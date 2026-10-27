@@ -39,7 +39,7 @@ import com.apis.goggles.data.Goggle
 @Composable
 fun SettingsScreen(
     state: AppState,
-    onSave: (braveKey: String, githubToken: String, repo: String, branch: String, queries: Map<Goggle, List<String>>) -> Unit,
+    onSave: (braveKey: String, githubToken: String, repo: String, branch: String) -> Unit,
     onResetPaging: (Goggle) -> Unit,
     onBack: () -> Unit,
 ) {
@@ -48,10 +48,9 @@ fun SettingsScreen(
     var token by remember { mutableStateOf(state.githubToken) }
     var repo by remember { mutableStateOf(state.repo) }
     var branch by remember { mutableStateOf(state.branch) }
-    val queries = remember { Goggle.entries.associateWith { mutableStateOf(state.of(it).queries.joinToString("\n")) } }
 
     fun save() {
-        onSave(brave, token, repo, branch, queries.mapValues { (_, v) -> v.value.lines().map { it.trim() }.filter { it.isNotEmpty() }.distinct() })
+        onSave(brave, token, repo, branch)
         onBack()
     }
 
@@ -89,15 +88,16 @@ fun SettingsScreen(
             }
 
             Goggle.entries.forEach { g ->
-                Section("Apis ${g.label} search topics")
-                OutlinedTextField(
-                    value = queries.getValue(g).value,
-                    onValueChange = { queries.getValue(g).value = it },
-                    label = { Text("One search per line") },
-                    minLines = 4,
-                    modifier = Modifier.fillMaxWidth(),
+                val gs = state.of(g)
+                val used = gs.queries.count { (gs.offsets[it] ?: 0) > 0 }
+                Section("Apis ${g.label} search terms")
+                Text(
+                    "${gs.queries.size} terms from ${g.termsPath}, picked at random; $used searched so far. " +
+                        "Edit search_terms.xlsx, export and push; the app picks them up on its next start.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                TextButton(onClick = { onResetPaging(g) }) { Text("Search these topics again from page 1") }
+                TextButton(onClick = { onResetPaging(g) }) { Text("Start all terms over from page 1") }
             }
             Button(onClick = ::save, modifier = Modifier.fillMaxWidth()) { Text("Save") }
             Spacer(Modifier.height(24.dp))

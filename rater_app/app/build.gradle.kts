@@ -12,6 +12,8 @@ val copyGoggles by tasks.registering(Copy::class) {
     from(rootProject.file("../Apis_health/apis_health.goggle"))
     from(rootProject.file("../Apis_news/apis_news.goggle"))
     from(rootProject.file("../Apis_news/middle_east_sources.csv")) { rename { "news_seed.csv" } }
+    from(rootProject.file("../Apis_health/search_terms.txt")) { rename { "health_terms.txt" } }
+    from(rootProject.file("../Apis_news/search_terms.txt")) { rename { "news_terms.txt" } }
     into(goggleAssets)
 }
 

@@ -48,3 +48,7 @@ private fun splitCsv(line: String): List<String> {
     out += sb.toString()
     return out
 }
+
+/** search_terms.txt: one term per line, blank lines and # comments ignored. */
+fun parseTerms(text: String): List<String> =
+    text.lineSequence().map { it.trim() }.filter { it.isNotEmpty() && !it.startsWith("#") }.distinct().toList()

@@ -2,28 +2,11 @@ package com.apis.goggles.data
 
 import kotlinx.serialization.Serializable
 
+/** Search terms are edited in search_terms.xlsx and exported to each goggle's search_terms.txt. */
 @Serializable
-enum class Goggle(val label: String, val repoPath: String, val asset: String, val defaultQueries: List<String>) {
-    HEALTH(
-        "Health", "Apis_health/apis_health.goggle", "apis_health.goggle",
-        listOf(
-            "carnivore diet benefits", "ancestral nutrition", "raw milk health benefits",
-            "seed oils inflammation", "vaccine injury research", "natural cancer treatment",
-            "chiropractic care benefits", "autoimmune protocol diet", "grass fed beef nutrition",
-            "functional medicine doctor", "metabolic health insulin resistance", "fluoride toxicity",
-            "holistic dentistry", "herbal remedies", "organ meats nutrition", "long covid treatment",
-        ),
-    ),
-    NEWS(
-        "News", "Apis_news/apis_news.goggle", "apis_news.goggle",
-        listOf(
-            "US Iran negotiations", "War in Lebanon news", "How was the State of Israel established",
-            "History of Antisemitism", "Jewish population before and after World War II",
-            "Gaza ceasefire news", "Ukraine war news", "Syria news", "Yemen Red Sea shipping",
-            "independent journalism", "big tech censorship", "Federal Reserve interest rates",
-            "election integrity news", "foreign policy analysis",
-        ),
-    ),
+enum class Goggle(val label: String, val repoPath: String, val asset: String, val termsPath: String, val termsAsset: String) {
+    HEALTH("Health", "Apis_health/apis_health.goggle", "apis_health.goggle", "Apis_health/search_terms.txt", "health_terms.txt"),
+    NEWS("News", "Apis_news/apis_news.goggle", "apis_news.goggle", "Apis_news/search_terms.txt", "news_terms.txt"),
 }
 
 @Serializable
@@ -87,7 +70,6 @@ data class GoggleState(
     val queries: List<String> = emptyList(),
     /** Next Brave result page (0–9) per query; 10 means exhausted. */
     val offsets: Map<String, Int> = emptyMap(),
-    val nextQuery: Int = 0,
     /** Latest goggle text seen on GitHub, or the bundled snapshot. */
     val text: String? = null,
     val seeded: Boolean = false,
@@ -101,8 +83,9 @@ data class AppState(
     val branch: String = "main",
     val goggles: Map<Goggle, GoggleState> = emptyMap(),
     val ratings: List<Rating> = emptyList(),
+    val termsVersion: Int = 0,
 ) {
-    fun of(g: Goggle): GoggleState = goggles[g] ?: GoggleState(queries = g.defaultQueries)
+    fun of(g: Goggle): GoggleState = goggles[g] ?: GoggleState()
 
     fun with(g: Goggle, f: (GoggleState) -> GoggleState): AppState = copy(goggles = goggles + (g to f(of(g))))
 

@@ -16,7 +16,9 @@ import com.apis.goggles.data.HttpError
 import com.apis.goggles.data.Rating
 import com.apis.goggles.data.StateStore
 import com.apis.goggles.data.SyncState
+import com.apis.goggles.data.GoggleState
 import com.apis.goggles.data.parseSeedCsv
+import com.apis.goggles.data.parseTerms
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -66,9 +68,15 @@ class RaterViewModel(app: Application) : AndroidViewModel(app) {
             for (g in Goggle.entries) {
                 if (s.of(g).text == null) {
                     val text = store.asset(g.asset)
-                    s = s.with(g) { it.copy(text = text, queries = it.queries.ifEmpty { g.defaultQueries }) }
+                    s = s.with(g) { it.copy(text = text) }
+                }
+                // Bundled terms until GitHub answers; GitHub's copy wins once fetched.
+                if (s.of(g).queries.isEmpty() || s.termsVersion < TERMS_VERSION) {
+                    val terms = parseTerms(store.asset(g.termsAsset))
+                    s = s.with(g) { it.copy(queries = terms) }
                 }
             }
+            s = s.copy(termsVersion = TERMS_VERSION)
             _state.value = s
             _loaded.value = true
             seedNews()
@@ -124,15 +132,12 @@ class RaterViewModel(app: Application) : AndroidViewModel(app) {
     private suspend fun searchMore(g: Goggle) {
         var calls = 0
         while (state.value.of(g).queue.size < TARGET_QUEUE && calls < MAX_CALLS_PER_REFILL) {
-            val gs = state.value.of(g)
-            val qi = gs.queries.indices.map { (gs.nextQuery + it) % gs.queries.size }
-                .firstOrNull { (gs.offsets[gs.queries[it]] ?: 0) <= MAX_OFFSET }
-            if (qi == null) {
-                emit("All ${g.label} search queries are used up. Add more in Settings.")
+            val query = pickTerm(state.value.of(g))
+            if (query == null) {
+                emit("Every ${g.label} search term has been used. Add more to search_terms.xlsx, or start over in Settings.")
                 return
             }
-            val query = gs.queries[qi]
-            val offset = gs.offsets[query] ?: 0
+            val offset = state.value.of(g).offsets[query] ?: 0
             if (calls > 0) delay(1100) // Brave's free plan allows 1 request/second.
             val hits = try {
                 BraveApi.search(state.value.braveKey, query, offset)
@@ -155,10 +160,17 @@ class RaterViewModel(app: Application) : AndroidViewModel(app) {
                 val known = cur.queue.map { it.domain }.toSet()
                 val fresh = found.filterKeys { it !in known }.map { (d, hs) -> Candidate(d, hs.take(3), query) }
                 val next = if (hits.isEmpty()) MAX_OFFSET + 1 else offset + 1
-                s.with(g) { it.copy(queue = it.queue + fresh, offsets = it.offsets + (query to next), nextQuery = (qi + 1) % it.queries.size) }
+                s.with(g) { it.copy(queue = it.queue + fresh, offsets = it.offsets + (query to next)) }
             }
             prune(g)
         }
+    }
+
+    /** A random term, drawn only from those searched the fewest times so every term gets a turn first. */
+    private fun pickTerm(gs: GoggleState): String? {
+        val open = gs.queries.filter { (gs.offsets[it] ?: 0) <= MAX_OFFSET }
+        val least = open.minOfOrNull { gs.offsets[it] ?: 0 } ?: return null
+        return open.filter { (gs.offsets[it] ?: 0) == least }.random()
     }
 
     /** Drops queued sites that are now covered and auto-rates brand siblings of rated sites. */
@@ -245,8 +257,11 @@ class RaterViewModel(app: Application) : AndroidViewModel(app) {
     private suspend fun refreshFromGitHub() {
         val s = state.value
         for (g in Goggle.entries) {
-            val file = runCatching { GitHubApi.get(s.repo, s.branch, g.repoPath, s.githubToken) }.getOrNull() ?: continue
-            update { st -> st.with(g) { it.copy(text = file.text) } }
+            val file = runCatching { GitHubApi.get(s.repo, s.branch, g.repoPath, s.githubToken) }.getOrNull()
+            if (file != null) update { st -> st.with(g) { it.copy(text = file.text) } }
+            val terms = runCatching { GitHubApi.get(s.repo, s.branch, g.termsPath, s.githubToken) }.getOrNull()
+                ?.let { parseTerms(it.text) }?.takeIf { it.isNotEmpty() }
+            if (terms != null) update { st -> st.with(g) { it.copy(queries = terms) } }
         }
     }
 
@@ -301,13 +316,9 @@ class RaterViewModel(app: Application) : AndroidViewModel(app) {
 
     // ---- settings -----------------------------------------------------------------------------
 
-    fun saveSettings(braveKey: String, githubToken: String, repo: String, branch: String, queries: Map<Goggle, List<String>>) {
+    fun saveSettings(braveKey: String, githubToken: String, repo: String, branch: String) {
         viewModelScope.launch {
-            update { s ->
-                var n = s.copy(braveKey = braveKey.trim(), githubToken = githubToken.trim(), repo = repo.trim(), branch = branch.trim())
-                queries.forEach { (g, q) -> n = n.with(g) { it.copy(queries = q, nextQuery = 0) } }
-                n
-            }
+            update { s -> s.copy(braveKey = braveKey.trim(), githubToken = githubToken.trim(), repo = repo.trim(), branch = branch.trim()) }
             refreshFromGitHub()
             Goggle.entries.forEach { prune(it) }
             refill(selected.value)
@@ -316,7 +327,7 @@ class RaterViewModel(app: Application) : AndroidViewModel(app) {
 
     fun resetPaging(g: Goggle) {
         viewModelScope.launch {
-            update { s -> s.with(g) { it.copy(offsets = emptyMap(), nextQuery = 0) } }
+            update { s -> s.with(g) { it.copy(offsets = emptyMap()) } }
             refill(g)
         }
     }
@@ -326,5 +337,8 @@ class RaterViewModel(app: Application) : AndroidViewModel(app) {
         private const val TARGET_QUEUE = 15
         private const val MAX_CALLS_PER_REFILL = 4
         private const val MAX_OFFSET = 9
+
+        /** Bump to replace stored terms with the bundled ones (v1 had a hard-coded list). */
+        private const val TERMS_VERSION = 1
     }
 }
