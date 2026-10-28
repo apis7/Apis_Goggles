@@ -24,7 +24,9 @@ data class Candidate(
     val hits: List<Hit> = emptyList(),
     /** The search query (or seed-list topic) that surfaced this site. */
     val source: String = "",
-)
+) {
+    val fromSearch: Boolean get() = !source.startsWith("Seed list")
+}
 
 @Serializable
 data class Rating(

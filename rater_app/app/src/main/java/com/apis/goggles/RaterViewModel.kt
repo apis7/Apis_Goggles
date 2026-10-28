@@ -32,6 +32,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.io.IOException
+import kotlin.random.Random
 
 sealed interface UiEvent {
     data class Message(val text: String) : UiEvent
@@ -73,7 +74,8 @@ class RaterViewModel(app: Application) : AndroidViewModel(app) {
                 // Bundled terms until GitHub answers; GitHub's copy wins once fetched.
                 if (s.of(g).queries.isEmpty() || s.termsVersion < TERMS_VERSION) {
                     val terms = parseTerms(store.asset(g.termsAsset))
-                    s = s.with(g) { it.copy(queries = terms) }
+                    // Drop sites queued by searches for terms that are no longer in the list.
+                    s = s.with(g) { gs -> gs.copy(queries = terms, queue = gs.queue.filter { !it.fromSearch || it.source in terms }) }
                 }
             }
             s = s.copy(termsVersion = TERMS_VERSION)
@@ -122,7 +124,7 @@ class RaterViewModel(app: Application) : AndroidViewModel(app) {
 
     fun refill(g: Goggle) {
         if (searchJobs[g]?.isActive == true) return
-        if (state.value.braveKey.isBlank() || state.value.of(g).queue.size >= LOW_WATER) return
+        if (state.value.braveKey.isBlank() || state.value.of(g).queue.count { it.fromSearch } >= LOW_WATER) return
         searchJobs[g] = viewModelScope.launch {
             _searching.update { it + g }
             try { searchMore(g) } finally { _searching.update { it - g } }
@@ -131,7 +133,7 @@ class RaterViewModel(app: Application) : AndroidViewModel(app) {
 
     private suspend fun searchMore(g: Goggle) {
         var calls = 0
-        while (state.value.of(g).queue.size < TARGET_QUEUE && calls < MAX_CALLS_PER_REFILL) {
+        while (state.value.of(g).queue.count { it.fromSearch } < TARGET_QUEUE && calls < MAX_CALLS_PER_REFILL) {
             val query = pickTerm(state.value.of(g))
             if (query == null) {
                 emit("Every ${g.label} search term has been used. Add more to search_terms.xlsx, or start over in Settings.")
@@ -158,12 +160,21 @@ class RaterViewModel(app: Application) : AndroidViewModel(app) {
             update { s ->
                 val cur = s.of(g)
                 val known = cur.queue.map { it.domain }.toSet()
-                val fresh = found.filterKeys { it !in known }.map { (d, hs) -> Candidate(d, hs.take(3), query) }
+                // A few sites per term, scattered into the queue, so consecutive cards come from different searches.
+                val fresh = found.filterKeys { it !in known }.entries.shuffled().take(SITES_PER_TERM)
+                    .map { (d, hs) -> Candidate(d, hs.take(3), query) }
                 val next = if (hits.isEmpty()) MAX_OFFSET + 1 else offset + 1
-                s.with(g) { it.copy(queue = it.queue + fresh, offsets = it.offsets + (query to next)) }
+                s.with(g) { it.copy(queue = scatter(it.queue, fresh), offsets = it.offsets + (query to next)) }
             }
             prune(g)
         }
+    }
+
+    /** Inserts [fresh] at random spots near the front, never displacing the card on screen. */
+    private fun scatter(queue: List<Candidate>, fresh: List<Candidate>): List<Candidate> {
+        val out = queue.toMutableList()
+        for (c in fresh) out.add(if (out.isEmpty()) 0 else Random.nextInt(1, minOf(out.size, SCATTER_WINDOW) + 1), c)
+        return out
     }
 
     /** A random term, drawn only from those searched the fewest times so every term gets a turn first. */
@@ -261,7 +272,9 @@ class RaterViewModel(app: Application) : AndroidViewModel(app) {
             if (file != null) update { st -> st.with(g) { it.copy(text = file.text) } }
             val terms = runCatching { GitHubApi.get(s.repo, s.branch, g.termsPath, s.githubToken) }.getOrNull()
                 ?.let { parseTerms(it.text) }?.takeIf { it.isNotEmpty() }
-            if (terms != null) update { st -> st.with(g) { it.copy(queries = terms) } }
+            if (terms != null) {
+                update { st -> st.with(g) { gs -> gs.copy(queries = terms, queue = gs.queue.filter { !it.fromSearch || it.source in terms }) } }
+            }
         }
     }
 
@@ -335,10 +348,12 @@ class RaterViewModel(app: Application) : AndroidViewModel(app) {
     companion object {
         private const val LOW_WATER = 6
         private const val TARGET_QUEUE = 15
-        private const val MAX_CALLS_PER_REFILL = 4
+        private const val MAX_CALLS_PER_REFILL = 6
+        private const val SITES_PER_TERM = 3
+        private const val SCATTER_WINDOW = 25
         private const val MAX_OFFSET = 9
 
         /** Bump to replace stored terms with the bundled ones (v1 had a hard-coded list). */
-        private const val TERMS_VERSION = 1
+        private const val TERMS_VERSION = 2
     }
 }
